@@ -31,10 +31,13 @@ module.exports = (options = {}) =>{
                 return isFamilyMatch(decl.value, family) ? 1 : 0
               }, 0) > 0 ) {
                 rule.removeChild(decl);
-                rule.append({
-                  prop: "font-family",
-                  value: removeFamily(decl.value, families)
-                });
+                // Clone so the new declaration keeps its source (Vite warns about declarations without one),
+                // but drop !important and the original formatting, as the plain declaration did before
+                rule.append(decl.clone({
+                  value: removeFamily(decl.value, families),
+                  important: false,
+                  raws: {}
+                }));
 
                 let insert = {
                   rule: rule,
